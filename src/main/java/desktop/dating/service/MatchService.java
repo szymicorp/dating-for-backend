@@ -32,6 +32,10 @@ public class MatchService {
         this.matchRepository.save(match);
     }
 
+    public void updateMatch(Match match) {
+        this.matchRepository.save(match);
+    }
+
     public void removeMatch(Match match) {
         this.matchRepository.delete(match);
     }

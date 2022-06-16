@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -26,10 +27,16 @@ public class Match {
     @Column(nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime createdAt;
+    @OneToMany
+    private List<Message> messages;
 
     public Match(Like like) {
         user1 = like.getSender();
         user2 = like.getReceiver();
         createdAt = LocalDateTime.now();
+    }
+
+    public void addMessage(Message message) {
+        messages.add(message);
     }
 }

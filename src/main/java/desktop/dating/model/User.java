@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,14 +32,25 @@ public class User {
     private String password;
     private String firstName;
     private String lastName;
+    @ElementCollection
+    private List<String> photos = new ArrayList<>();
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
     private boolean sex;
     private boolean premium;
+    private String bio;
+    @ElementCollection
+    private List<String> interests = new ArrayList<>();
+
+    private double maxDistance;
+    private int minAge;
+    private int maxAge;
+    private boolean sexPreference;
+    private boolean publicProfile;
 
     @OneToMany(fetch = FetchType.EAGER)
     @JsonIgnore
-    List<User> dislikes;
+    List<User> dislikes = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "receiver")
     @JsonIgnore
@@ -53,7 +65,11 @@ public class User {
     List<DeletedMatch> deletedMatches;
 
     public int getAge() {
-        return 18;
+        return birthDate.until(LocalDate.now()).getYears();
+    }
+
+    public void addDisliked(User user) {
+        dislikes.add(user);
     }
 
     public void addMatch(Match match) {
@@ -66,5 +82,16 @@ public class User {
 
     public void addDeletedMatch(DeletedMatch deletedMatch) {
         deletedMatches.add(deletedMatch);
+    }
+
+    public boolean wasntAlreadySeenBy(User user) {
+        return receivedLikes.stream()
+                .noneMatch(like ->
+                        like.getSender().equals(user)
+                ) &&
+                matches.stream()
+                .noneMatch(match ->
+                        match.getUser1().equals(user) || match.getUser2().equals(user)
+                );
     }
 }
